@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">Microstrip cross-section geometry</title>
+  <desc id="desc">Two dielectric layers, finite ground plane, trapezoidal signal trace, and air box.</desc>
+  <rect x="30" y="30" width="840" height="360" fill="#f7fbff" stroke="#24445f" stroke-width="3"/>
+  <rect x="120" y="205" width="660" height="115" fill="#91d9ce" stroke="#4c9188" stroke-width="2"/>
+  <rect x="120" y="115" width="660" height="90" fill="#b6eadf" stroke="#65a79b" stroke-width="2"/>
+  <rect x="165" y="315" width="570" height="18" fill="#f5a623" stroke="#b57916" stroke-width="2"/>
+  <polygon points="405,198 495,198 535,135 365,135" fill="#f5a623" stroke="#b57916" stroke-width="2"/>
+  <line x1="120" y1="205" x2="780" y2="205" stroke="#ffffff" stroke-width="2" stroke-dasharray="8 7"/>
+  <line x1="95" y1="205" x2="95" y2="320" stroke="#1f3344" stroke-width="3"/>
+  <line x1="88" y1="205" x2="102" y2="205" stroke="#1f3344" stroke-width="3"/>
+  <line x1="88" y1="320" x2="102" y2="320" stroke="#1f3344" stroke-width="3"/>
+  <text x="57" y="268" font-family="Arial, sans-serif" font-size="26" fill="#1f3344">H1</text>
+  <line x1="95" y1="115" x2="95" y2="205" stroke="#1f3344" stroke-width="3"/>
+  <line x1="88" y1="115" x2="102" y2="115" stroke="#1f3344" stroke-width="3"/>
+  <text x="57" y="165" font-family="Arial, sans-serif" font-size="26" fill="#1f3344">H2</text>
+  <line x1="365" y1="108" x2="535" y2="108" stroke="#1f3344" stroke-width="3"/>
+  <line x1="365" y1="100" x2="365" y2="116" stroke="#1f3344" stroke-width="3"/>
+  <line x1="535" y1="100" x2="535" y2="116" stroke="#1f3344" stroke-width="3"/>
+  <text x="432" y="95" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">W2</text>
+  <line x1="405" y1="222" x2="495" y2="222" stroke="#1f3344" stroke-width="3"/>
+  <line x1="405" y1="214" x2="405" y2="230" stroke="#1f3344" stroke-width="3"/>
+  <line x1="495" y1="214" x2="495" y2="230" stroke="#1f3344" stroke-width="3"/>
+  <text x="432" y="252" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">W1</text>
+  <line x1="565" y1="135" x2="565" y2="198" stroke="#1f3344" stroke-width="3"/>
+  <line x1="555" y1="135" x2="575" y2="135" stroke="#1f3344" stroke-width="3"/>
+  <line x1="555" y1="198" x2="575" y2="198" stroke="#1f3344" stroke-width="3"/>
+  <text x="582" y="174" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">T</text>
+  <text x="655" y="175" font-family="Arial, sans-serif" font-size="26" fill="#245e59">Er2</text>
+  <text x="655" y="275" font-family="Arial, sans-serif" font-size="26" fill="#245e59">Er1</text>
+  <text x="368" y="360" font-family="Arial, sans-serif" font-size="24" fill="#7b4f0e">Ground</text>
+  <text x="398" y="128" font-family="Arial, sans-serif" font-size="22" fill="#7b4f0e">Trace</text>
+  <text x="50" y="65" font-family="Arial, sans-serif" font-size="22" fill="#24445f">Air box</text>
+</svg>
