@@ -21,14 +21,14 @@ permissions:
 
 concurrency:
   group: docs-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: pip
@@ -38,7 +38,7 @@ jobs:
       - name: Build and check documentation
         run: python -m mkdocs build --strict
       - name: Upload HTML for review
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: documentation-html
           path: site/
@@ -52,9 +52,6 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    concurrency:
-      group: github-pages
-      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
