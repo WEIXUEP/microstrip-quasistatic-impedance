@@ -1,63 +1,63 @@
-# 常见问题
+# Troubleshooting
 
-## 找不到 gmsh / skfem / scipy 模块
+## Missing gmsh, skfem, or scipy
 
-通常是安装依赖的 Python 与运行脚本的 Python 不同。用同一个解释器安装和运行：
+The interpreter running the script may differ from the one that installed the packages. Use the same interpreter for both:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe microstrip_quasistatic.py
 ```
 
-在 Linux/macOS 中将解释器路径换成 `.venv/bin/python`。包名为 `scikit-fem`，导入名为 `skfem`。
+On Linux/macOS, use `.venv/bin/python`. The package is named `scikit-fem`, but its import name is `skfem`.
 
-## Linux 缺少 libGLU.so.1
+## Missing libGLU.so.1 on Linux
 
-Gmsh Python 包需要本机动态库，即使脚本没有打开 GUI，也可能在导入时加载这些库。Ubuntu/Debian 通常可以安装：
+The Gmsh Python package can load native GUI libraries even when the script does not open a GUI. On Ubuntu/Debian, the usual package is:
 
 ```bash
 sudo apt-get update
 sudo apt-get install libglu1-mesa
 ```
 
-其他发行版请按实际错误查找对应系统包。若提示缺少 `venv`，Ubuntu/Debian 通常需要 `python3-venv`。
+For other distributions, use the package matching the actual library error. If virtual-environment creation fails, Ubuntu/Debian may also need `python3-venv`.
 
-## Windows 提示 DLL load failed
+## DLL load failed on Windows
 
-确认 Python 架构与安装的包匹配，并使用 `python -m pip install --upgrade gmsh` 获取适配当前环境的 wheel。继续失败时保存完整错误、Python 版本和系统架构，检查是否缺少该 wheel 所需的本机运行库。
+Confirm that Python and the installed wheel have matching architectures. Try `python -m pip install --upgrade gmsh` for a wheel compatible with the environment. If the problem persists, record the full error, Python version, and architecture, then check the native runtimes required by that wheel.
 
-## trace_thickness must be smaller than h2
+## Trace thickness must be smaller than h2
 
-T 必须小于 H2，因为信号线从两层介质界面向上延伸，H2 包含 T。其他输入约束见[几何说明](geometry.md)。
+The trace extends upward from the layer interface. H2 includes T, so T must be smaller than H2. See the other [input constraints](geometry.md#valid-inputs).
 
-## failed to identify signal or ground boundary / DOFs
+## Failed to identify signal or ground boundaries / DOFs
 
-先检查长度是否为正、走线是否在基板内、T 是否小于 H2，以及有没有把 mm 当成 mil。极小尺度还可能接近几何识别使用的绝对容差；这种情况需要检查源码容差，不能仅靠加密网格解决。
+Check that lengths are positive, the trace fits within the substrate, T < H2, and millimeters were not passed as mil. Extremely small features may approach the absolute tolerances used for boundary identification. That requires reviewing the tolerances in the source; refining the mesh alone may not resolve it.
 
-## 结果和 Polar 或其他工具不同
+## Disagreement with Polar or another solver
 
-先对齐 W1/W2 梯形方向、H2 是否包含铜厚、材料、有限宽地和空气盒边界。然后分别做网格与计算域收敛。历史表只代表所列案例，详细限制见[对照案例](validation.md)。
+First align W1/W2 orientation, whether H2 includes copper thickness, material values, finite-ground assumptions, and outer boundaries. Then check mesh and domain convergence separately. The historical benchmark table applies only to its listed cases; see [benchmark limitations](validation.md#polar-si9000).
 
-## 改了 --order 2，但 .msh 仍然是一阶网格
+## The mesh stays first order with --order 2
 
-这是当前实现的正常行为。P2 电位空间由 scikit-fem 构造，导出的 Gmsh 网格仍是一阶，见[阶数说明](cli.md)。
+This is expected. scikit-fem constructs the P2 potential space internally. The Gmsh export remains first order; see [FEM versus mesh order](cli.md#fem-order-versus-mesh-order).
 
-## 网格很多、内存占用大或求解慢
+## Too many elements, high memory use, or a slow solve
 
-面积因子越大，网格越细。先用默认值或较粗网格确认几何，再逐级加密。P2 通常比 P1 使用更多自由度；不要同时大幅增加所有网格因子和空气盒尺寸。
+Larger area factors make the mesh finer. Confirm the geometry with default or coarser settings, then refine gradually. P2 generally uses more degrees of freedom than P1. Avoid enlarging the air box and all mesh factors aggressively at once.
 
-## 为什么没有电场图、S 参数或频率选项？
+## No field plots, S parameters, or frequency option
 
-目前只导出网格和准静态标量结果。电位存在求解返回值中，尚未实现场文件输出；S 参数、损耗和三维全波分析超出当前程序范围。
+The script currently exports a mesh and quasi-static scalar results. Potential values are returned by the solver but are not exported as a field file. S parameters, losses, and full-wave analysis are outside the current implementation.
 
-## 文档本地构建失败
+## Documentation build fails
 
-在项目根目录执行 `python -m pip install -r requirements-docs.txt`，再运行 `python -m mkdocs build --strict`。严格构建中的内部链接或配置警告也会导致失败，需按日志修正。
+From the repository root, install `requirements-docs.txt` and run `python -m mkdocs build --strict`. Internal-link or configuration warnings also fail this strict build; correct the items shown in the log.
 
-## GitHub Pages 返回 404
+## GitHub Pages returns 404
 
-在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。检查 **Actions → Documentation** 工作流是否完成 build 和 deploy；仅 build 成功还没有发布。项目网址包含仓库名路径，完整地址见[发布步骤](development.md#github-pages)。
+Under **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**. In **Actions → Documentation**, confirm that both build and deploy have completed. A successful build alone does not publish the site. Use the full [project URL](development.md#github-pages), including the repository name.
 
-## 如何报告问题
+## Report a problem
 
-在 [GitHub Issues](https://github.com/WEIXUEP/microstrip-quasistatic-impedance/issues) 提供：完整运行命令、预期与实际现象、错误日志、`result.json`（如已生成）、操作系统、Python/依赖版本和 Git 提交号。外部工具对比请附模型与边界定义。
+Open a [GitHub issue](https://github.com/WEIXUEP/microstrip-quasistatic-impedance/issues) with the complete command, expected and observed behavior, error log, `result.json` if generated, operating system, Python/dependency versions, and Git commit. For solver comparisons, include the geometry and boundary definitions of both models.

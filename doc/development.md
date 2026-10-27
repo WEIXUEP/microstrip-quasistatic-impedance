@@ -1,56 +1,56 @@
-# 开发与文档发布
+# Development & publishing
 
-## 仓库结构
+## Repository layout
 
 ```text
-microstrip_quasistatic.py   几何、网格、有限元、CLI 与 JSON 输出
-requirements.txt           计算运行依赖
-requirements-docs.txt      文档构建依赖
-README.md                  英文仓库入口
-README.zh-CN.md            中文仓库入口
-mkdocs.yml                 网站主题、搜索与导航配置
-doc/                       Markdown 文档和 SVG 几何示意图
-.github/workflows/docs.yml 文档检查与 GitHub Pages 发布
+microstrip_quasistatic.py   Geometry, mesh, FEM, CLI, and JSON output
+requirements.txt           Solver dependencies
+requirements-docs.txt      Documentation dependencies
+README.md                  English repository entry point
+mkdocs.yml                 Site configuration and navigation
+doc/                       English pages, diagrams, styles, and local fonts
+overrides/                 MkDocs theme templates
+.github/workflows/docs.yml Documentation checks and Pages deployment
 ```
 
-`.venv/`、`output/` 和 `site/` 是本地环境或生成产物，不应提交到源码仓库。
+`.venv/`, `output/`, and `site/` are local environments or generated files and are excluded from version control.
 
 ## Python API {#python-api}
 
-模块可以直接导入，导入时不会自动执行 `main()`。主要接口如下：
+The module can be imported without running `main()`.
 
-| 接口 | 输入 | 返回或作用 |
+| Interface | Inputs | Return / effect |
 | --- | --- | --- |
-| `MicrostripGeometry(...)` | 长度（mil）、介电常数、尺寸和网格因子 | 冻结的数据类 |
-| `generate_mesh(p, mesh_path)` | 几何对象、输出 `Path` | 写 `.msh`，返回 `MeshData` |
-| `solve_electrostatic(mesh, p, vacuum, order)` | 网格、同一几何、是否真空、阶数 1/2 | `(potential, capacitance_per_length)` |
+| `MicrostripGeometry(...)` | Lengths in mil, permittivities, domain and mesh factors | Frozen dataclass |
+| `generate_mesh(p, mesh_path)` | Geometry and output `Path` | Writes `.msh`; returns `MeshData` |
+| `solve_electrostatic(mesh, p, vacuum, order)` | Mesh, matching geometry, vacuum flag, order 1/2 | `(potential, capacitance_per_length)` |
 
-`MeshData.points` 为 `(N, 2)` 的米坐标，`triangles` 为 `(M, 3)` 的零起始顶点索引，`relative_permittivity` 长度为 M。`signal_nodes` 和 `ground_nodes` 保存顶点索引；求解器通过自由度坐标重新识别固定电位位置，以覆盖 P2 边中点。
+`MeshData.points` has shape `(N, 2)` and coordinates in meters. `triangles` has shape `(M, 3)` with zero-based vertex indices; `relative_permittivity` has length M. `signal_nodes` and `ground_nodes` contain vertex indices. The solver re-identifies fixed-potential DOFs from physical coordinates to include P2 edge midpoints.
 
-`potential` 是有限元自由度顺序的电位数组；P2 时长度一般大于顶点数，不能当成 Gmsh 原始节点顺序的数据。电容单位为 F/m。
+`potential` follows the finite-element DOF ordering. With P2, its length generally exceeds the vertex count and does not match the original Gmsh node order. Capacitance is returned in F/m.
 
-### 类字段默认值
+### Dataclass defaults
 
-| 字段 | 默认值 | 单位 |
+| Field | Default | Unit |
 | --- | ---: | --- |
 | `h1`, `h2` | 2.97, 3.53 | mil |
 | `w1`, `w2` | **5.60, 5.60** | mil |
 | `trace_thickness` | 1.80 | mil |
-| `er1`, `er2` | 4.20, 4.20 | 无量纲 |
-| `substrate_width_factor` | 30.0 | 无量纲 |
-| `air_padding_x_factor` | 10.0 | 无量纲 |
-| `air_padding_top_factor` | 10.0 | 无量纲 |
-| `air_padding_bottom_factor` | 2.0 | 无量纲 |
-| `trace_mesh_area_factor` | 50.0 | 无量纲 |
-| `far_mesh_area_factor` | 400.0 | 无量纲 |
+| `er1`, `er2` | 4.20, 4.20 | Dimensionless |
+| `substrate_width_factor` | 30.0 | Dimensionless |
+| `air_padding_x_factor` | 10.0 | Dimensionless |
+| `air_padding_top_factor` | 10.0 | Dimensionless |
+| `air_padding_bottom_factor` | 2.0 | Dimensionless |
+| `trace_mesh_area_factor` | 50.0 | Dimensionless |
+| `far_mesh_area_factor` | 400.0 | Dimensionless |
 | `mesh_size_trace` | 0.12 | mil |
 | `mesh_size_far` | 3.0 | mil |
 
-类本身不根据面积因子自动重算网格尺寸，`generate_mesh()` 直接使用 `mesh_size_trace` / `mesh_size_far`。CLI 的 `main()` 才会通过 `dataclasses.replace()` 将尺寸换算为[面积公式](cli.md)的结果。使用 API 时要明确选择手动尺寸还是面积因子推导。
+The dataclass does not automatically derive target sizes from area factors. `generate_mesh()` directly uses `mesh_size_trace` and `mesh_size_far`. The CLI's `main()` applies the [area formulas](cli.md#mesh-area-factors) through `dataclasses.replace()`. When using the API, explicitly choose manual sizes or area-derived ones.
 
-### 最小调用示例
+### Minimal API example
 
-在项目根目录保存为独立脚本并使用虚拟环境运行：
+Save this as a separate script in the project root and run it with the virtual environment:
 
 ```python
 from dataclasses import replace
@@ -74,52 +74,62 @@ impedance = 1.0 / (c * sqrt(capacitance * vacuum_capacitance))
 print(f"Z0 = {impedance:.6f} ohm")
 ```
 
-`generate_mesh()` 自行初始化和结束 Gmsh 会话，不要嵌套在另一个自行管理的 Gmsh 会话中调用。
+`generate_mesh()` initializes and finalizes its own Gmsh session. Do not nest it inside a separately managed Gmsh session.
 
-## 本地预览 HTML
+## Preview the documentation
 
-在项目根目录安装文档依赖；不需要安装计算依赖或运行求解器：
+Install the documentation dependencies from the repository root. No solver dependencies or simulation run are required:
 
 ```shell
 python -m pip install -r requirements-docs.txt
 python -m mkdocs serve
 ```
 
-浏览器打开终端显示的地址，通常为 [http://127.0.0.1:8000/](http://127.0.0.1:8000/)。修改 Markdown 后预览会刷新。Windows 可用 `.\.venv\Scripts\python.exe` 替换 `python`。
+Open the URL shown in the terminal, usually [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Changes refresh automatically. On Windows, replace `python` with `.\.venv\Scripts\python.exe` when needed.
 
-生成可部署的静态 HTML：
+Build deployable HTML:
 
 ```shell
 python -m mkdocs build --strict
 ```
 
-产物位于 `site/`。建议通过 HTTP 服务预览，保证目录链接和搜索正常工作：
+The output is in `site/`. Preview over HTTP so directory links and search work correctly:
 
 ```shell
 python -m http.server 8000 --directory site
 ```
 
-## GitHub Pages 发布 {#github-pages}
+## Interface design
 
-本站目标网址：
+The English interface uses an annotated cross section as the overview's main visual, with blue dielectric regions and copper conductors. Chapter navigation stays on the left; reference pages add an in-page contents list on the right. On smaller screens the introduction stacks above the diagram and navigation moves into a drawer.
+
+`doc/assets/stylesheets/engineering.css` defines colors, spacing, responsive layouts, focus indicators, and light/dark styles. `overrides/main.html` wraps the overview content for customization. Search, navigation, copy buttons, and theme controls use MkDocs Material's English UI.
+
+IBM Plex Sans and IBM Plex Mono are self-hosted under `doc/assets/fonts/`; their SIL Open Font License is included there. Site visitors do not need to load fonts from a third-party font service. The geometry diagram and project mark are editable SVGs.
+
+## Publish to GitHub Pages {#github-pages}
+
+Site URL:
 
 **[https://weixuep.github.io/microstrip-quasistatic-impedance/](https://weixuep.github.io/microstrip-quasistatic-impedance/)**
 
-首次配置由仓库管理员完成：
+Initial setup requires repository administration access:
 
-1. 将文档源文件和 `.github/workflows/docs.yml` 提交到 `main`。
-2. 在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。
-3. 在 **Actions → Documentation → Run workflow** 选择 `main` 并运行，或推送一次文档改动。
-4. 等待 build 与 deploy 均成功，访问上述项目网址。
+1. Commit the documentation and `.github/workflows/docs.yml` to `main`.
+2. Under **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**.
+3. Under **Actions → Documentation → Run workflow**, select `main` and run, or push a documentation change.
+4. Wait for both build and deploy to succeed, then open the project URL.
 
-工作流不需要个人访问令牌或额外 Secret；部署使用 GitHub 的 `GITHUB_TOKEN` 和 OIDC，写权限只授予 deploy 作业。若仓库环境设置要求人工审核，需要在 GitHub 上完成相应审核。
+No personal access token or additional secret is required by the workflow. Deployment uses `GITHUB_TOKEN` and OIDC; Pages write permissions are limited to the deploy job. If environment rules require review, complete that review on GitHub.
 
-后续修改 `doc/`、`mkdocs.yml`、文档依赖或工作流，推送到 `main` 后会自动发布。Pull Request 只检查和构建，并上传 `documentation-html` 供审阅。手动触发也支持重新发布；非 `main` 分支不会部署。
+Changes to `doc/`, `overrides/`, `mkdocs.yml`, documentation dependencies, or the workflow trigger publishing when pushed to `main`. Pull requests build and upload a `documentation-html` artifact for review. Manual runs also support republishing; branches other than `main` do not deploy. Releases are serialized to avoid canceling an active deployment.
 
-迁移或 fork 仓库时，修改 `mkdocs.yml` 的 `site_url`、`repo_url`、`repo_name`，同步更新 README 和本页中的网站链接。若默认分支改变，还要更新工作流分支条件和 `edit_uri`。
+For a fork or repository move, update `site_url`, `repo_url`, and `repo_name` in `mkdocs.yml`, plus the README and the URL above. If the default branch changes, also update workflow conditions and `edit_uri`.
 
-## 维护检查
+## Maintenance checks
 
-文档修改后先运行严格构建，修正内部文件链接、导航和配置问题。增加页面时同步 `mkdocs.yml` 的 `nav`。严格构建不会验证外部站点是否在线，发布后仍需打开首页、侧栏页面和搜索检查。
+After editing documentation, run the strict build and fix internal links, navigation, and configuration warnings. Add new pages to `nav` in `mkdocs.yml`. Strict mode does not check remote URLs; verify the published pages and search after deployment.
 
-修改计算实现时，至少检查默认运行、全真空一致性和相关收敛结果。参数、单位、默认值、输出字段和边界行为变化时，同步更新相应文档。历史对照数据需要保留来源说明，新的精度结论应附可复现设置。
+Keep all documentation, navigation labels, alternative text, and interface controls in English. When changing the design, inspect desktop and mobile layouts, dark mode, tables, keyboard focus, navigation, and search. Font or SVG updates must preserve their licenses and accessible descriptions.
+
+When changing the solver, check default execution, vacuum consistency, and convergence relevant to the change. Update documentation when parameters, defaults, units, output fields, or boundary behavior change. Preserve the provenance of historical comparisons and provide reproducible settings for new accuracy claims.

@@ -1,8 +1,8 @@
-site_name: 微带线准静态阻抗计算
-site_description: 基于 Gmsh、scikit-fem 和 SciPy 的二维微带线准静态 FEM 使用与理论文档
+site_name: Microstrip FEM
+site_description: A practical engineering guide to quasi-static microstrip impedance with Gmsh, scikit-fem and SciPy.
 site_url: https://weixuep.github.io/microstrip-quasistatic-impedance/
 repo_url: https://github.com/WEIXUEP/microstrip-quasistatic-impedance
-repo_name: WEIXUEP/microstrip-quasistatic-impedance
+repo_name: View on GitHub
 edit_uri: edit/main/doc/
 docs_dir: doc
 site_dir: site
@@ -13,10 +13,15 @@ validation:
     anchors: warn
 theme:
   name: material
-  language: zh
+  custom_dir: overrides
+  language: en
+  font: false
+  logo: assets/mark.svg
+  favicon: assets/mark.svg
   features:
     - navigation.sections
     - navigation.top
+    - navigation.footer
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -24,41 +29,42 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: teal
-      accent: amber
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-night
-        name: 切换深色模式
+        name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: teal
-      accent: amber
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-sunny
-        name: 切换浅色模式
+        name: Switch to light mode
 plugins:
   - search:
-      lang:
-        - zh
-        - en
+      lang: en
 markdown_extensions:
   - admonition
   - attr_list
+  - md_in_html
   - tables
   - toc:
       permalink: true
   - pymdownx.details
   - pymdownx.superfences
+extra_css:
+  - assets/stylesheets/engineering.css
 nav:
-  - 首页: index.md
-  - 使用指南:
-      - 安装与快速开始: quickstart.md
-      - 几何、材料与边界: geometry.md
-      - 命令行参数: cli.md
-      - 输出文件与结果: output.md
-  - 计算与验证:
-      - 准静态 FEM 原理: theory.md
-      - 收敛与对照案例: validation.md
-  - 维护与支持:
-      - 常见问题: troubleshooting.md
-      - 开发与文档发布: development.md
+  - Overview: index.md
+  - User guide:
+      - Installation & first run: quickstart.md
+      - Geometry & boundaries: geometry.md
+      - Command-line reference: cli.md
+      - Output reference: output.md
+  - Method & verification:
+      - Quasi-static FEM: theory.md
+      - Convergence & benchmarks: validation.md
+  - Project:
+      - Troubleshooting: troubleshooting.md
+      - Development & publishing: development.md

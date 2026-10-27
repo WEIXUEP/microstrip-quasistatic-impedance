@@ -1,34 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
-  <title id="title">Microstrip cross-section geometry</title>
-  <desc id="desc">Two dielectric layers, finite ground plane, trapezoidal signal trace, and air box.</desc>
-  <rect x="30" y="30" width="840" height="360" fill="#f7fbff" stroke="#24445f" stroke-width="3"/>
-  <rect x="120" y="205" width="660" height="115" fill="#91d9ce" stroke="#4c9188" stroke-width="2"/>
-  <rect x="120" y="115" width="660" height="90" fill="#b6eadf" stroke="#65a79b" stroke-width="2"/>
-  <line x1="120" y1="205" x2="780" y2="205" stroke="#ffffff" stroke-width="2" stroke-dasharray="8 7"/>
-  <line x1="120" y1="320" x2="780" y2="320" stroke="#b57916" stroke-width="6"/>
-  <polygon points="405,205 495,205 535,135 365,135" fill="#f5a623" stroke="#b57916" stroke-width="2"/>
-  <line x1="95" y1="205" x2="95" y2="320" stroke="#1f3344" stroke-width="3"/>
-  <line x1="88" y1="205" x2="102" y2="205" stroke="#1f3344" stroke-width="3"/>
-  <line x1="88" y1="320" x2="102" y2="320" stroke="#1f3344" stroke-width="3"/>
-  <text x="57" y="268" font-family="Arial, sans-serif" font-size="26" fill="#1f3344">H1</text>
-  <line x1="95" y1="115" x2="95" y2="205" stroke="#1f3344" stroke-width="3"/>
-  <line x1="88" y1="115" x2="102" y2="115" stroke="#1f3344" stroke-width="3"/>
-  <text x="57" y="165" font-family="Arial, sans-serif" font-size="26" fill="#1f3344">H2</text>
-  <line x1="365" y1="108" x2="535" y2="108" stroke="#1f3344" stroke-width="3"/>
-  <line x1="365" y1="100" x2="365" y2="116" stroke="#1f3344" stroke-width="3"/>
-  <line x1="535" y1="100" x2="535" y2="116" stroke="#1f3344" stroke-width="3"/>
-  <text x="432" y="95" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">W2</text>
-  <line x1="405" y1="222" x2="495" y2="222" stroke="#1f3344" stroke-width="3"/>
-  <line x1="405" y1="214" x2="405" y2="230" stroke="#1f3344" stroke-width="3"/>
-  <line x1="495" y1="214" x2="495" y2="230" stroke="#1f3344" stroke-width="3"/>
-  <text x="432" y="252" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">W1</text>
-  <line x1="565" y1="135" x2="565" y2="205" stroke="#1f3344" stroke-width="3"/>
-  <line x1="555" y1="135" x2="575" y2="135" stroke="#1f3344" stroke-width="3"/>
-  <line x1="555" y1="205" x2="575" y2="205" stroke="#1f3344" stroke-width="3"/>
-  <text x="582" y="174" font-family="Arial, sans-serif" font-size="24" fill="#1f3344">T</text>
-  <text x="655" y="175" font-family="Arial, sans-serif" font-size="26" fill="#245e59">Er2</text>
-  <text x="655" y="275" font-family="Arial, sans-serif" font-size="26" fill="#245e59">Er1</text>
-  <text x="368" y="360" font-family="Arial, sans-serif" font-size="24" fill="#7b4f0e">Ground</text>
-  <text x="398" y="128" font-family="Arial, sans-serif" font-size="22" fill="#7b4f0e">Trace</text>
-  <text x="50" y="65" font-family="Arial, sans-serif" font-size="22" fill="#24445f">Air box</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="540" viewBox="0 0 720 540" role="img" aria-labelledby="title desc">
+  <title id="title">Two-layer microstrip cross section</title>
+  <desc id="desc">A centered trapezoidal conductor at one volt sits on the interface between dielectric layers Er1 and Er2. H1 and H2 measure the layers, W1 and W2 are the bottom and top trace widths, and T is the trace thickness. The finite ground at zero volts spans the substrate width. Air surrounds the structure within a zero-normal-flux outer boundary. Drawing not to scale.</desc>
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#e0ebf2" stroke-width="1"/></pattern>
+    <marker id="arrow" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto-start-reverse"><path d="M5 2.5L0 0v5z" fill="#526879"/></marker>
+  </defs>
+  <rect width="720" height="540" fill="#f8fbfd"/>
+  <rect x="30" y="36" width="660" height="460" fill="url(#grid)" stroke="#c0d2de" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <g font-family="Arial, sans-serif" font-size="17" fill="#526879">
+    <text x="50" y="66">Air · εr = 1</text>
+    <text x="50" y="477">Outer boundary: n · (ε ∇φ) = 0</text>
+  </g>
+  <rect x="135" y="166" width="450" height="138" fill="#dcecf5" stroke="#9dbcd0"/>
+  <rect x="135" y="304" width="450" height="112" fill="#b2d3e5" stroke="#7ca8c2"/>
+  <path d="M135 304H585" stroke="#fff" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <path d="M305 304H415L397 232H323Z" fill="#c68147" stroke="#8d4c22" stroke-width="2"/>
+  <path d="M135 416H585" stroke="#a55724" stroke-width="5"/>
+  <g stroke="#526879" stroke-width="1.3" fill="none">
+    <path d="M111 166H97M111 304H97M111 416H97"/>
+    <path d="M104 172V298M104 310V410" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <path d="M323 225V204M397 225V204M329 212H391" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <path d="M305 310V338M415 310V338M311 330H409" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <path d="M423 232H451M423 304H451M443 238V298" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="19" fill="#203345">
+    <text x="60" y="245">H2</text><text x="60" y="367">H1</text>
+    <text x="345" y="200">W2</text><text x="345" y="360">W1</text><text x="456" y="275">T</text>
+    <text x="508" y="206">Er2</text><text x="508" y="382">Er1</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="16" fill="#84421b">
+    <text x="331" y="278">1 V</text>
+    <text x="285" y="447">Finite ground · 0 V</text>
+  </g>
+  <path d="M505 145V155L410 232" fill="none" stroke="#526879"/>
+  <text x="447" y="137" font-family="Arial, sans-serif" font-size="16" fill="#526879">Signal conductor</text>
 </svg>

@@ -5,9 +5,8 @@ of a two-layer microstrip cross section with a finite-width ground plane.
 Gmsh builds the geometry and mesh; scikit-fem and SciPy solve the electrostatic
 finite element problems. No Palace or other external EM solver is required.
 
-**[HTML documentation / 在线文档](https://weixuep.github.io/microstrip-quasistatic-impedance/)**
-· [中文说明](README.zh-CN.md)
-· [Documentation sources](doc/index.md)
+**[Read the documentation](https://weixuep.github.io/microstrip-quasistatic-impedance/)**
+| [Documentation sources](doc/index.md)
 
 ![Microstrip cross section](doc/microstrip_geometry.svg)
 
@@ -72,8 +71,9 @@ general accuracy guarantee.
 
 ## Build the documentation website
 
-The Chinese HTML documentation uses MkDocs Material, with navigation, search,
-and light/dark themes. Documentation dependencies are separate from solver dependencies.
+The English documentation uses a custom engineering interface with an annotated
+cross section, chapter navigation, search, and light/dark themes. Fonts are
+self-hosted. Documentation dependencies are separate from solver dependencies.
 
 ```shell
 python -m pip install -r requirements-docs.txt

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if page.is_homepage %}
+    <div class="qs-home">{{ super() }}</div>
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}

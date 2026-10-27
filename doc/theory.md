@@ -1,8 +1,10 @@
-# 准静态 FEM 原理
+# Quasi-static FEM
 
-## 两个静电问题
+The solver uses two electrostatic capacitance calculations to recover lossless quasi-TEM transmission-line parameters.
 
-对均匀传输线横截面，设信号线与地之间电压差为 V。静电电位满足：
+## Two electrostatic problems
+
+For a uniform cross section with signal-to-ground voltage V, the potential satisfies:
 
 ```text
 ∇ · (ε ∇φ) = 0
@@ -10,40 +12,40 @@ E = −∇φ
 ε = ε0 εr
 ```
 
-程序固定信号线为 1 V、地为 0 V。在同一个离散网格上求解两次：
+The signal is fixed at 1 V and the ground at 0 V. Two problems are solved on the same discrete mesh:
 
-1. **实际介质问题**：空气 εr=1，两层介质分别为 Er1、Er2，得到 C。
-2. **真空参考问题**：所有非金属区域 εr=1，得到 C0。
+1. **Real dielectric:** air has εr=1, and the layers use Er1 and Er2. This gives C.
+2. **Vacuum reference:** all nonmetal regions use εr=1. This gives C0.
 
-第二次求解保留金属形状、地和空气盒，只替换介电系数。共享网格使两次问题具有一致的几何离散。
+The vacuum solve retains the metal geometry, ground, and air box. Only the permittivity changes. A shared mesh keeps the geometric discretization consistent.
 
-## 弱形式与离散
+## Weak form and discretization
 
-用满足齐次固定电位条件的测试函数 v 对方程积分，得到：
+Integrating with a test function v that vanishes on the fixed-potential boundaries gives:
 
 ```text
 ∫Ω ε ∇φ · ∇v dA = 0
 Kij = ∫Ω ε ∇Ni · ∇Nj dA
 ```
 
-每个三角形使用分片常数介电系数，通过 `ElementTriP0` 材料场传给双线性型。电位使用 `ElementTriP1` 或 `ElementTriP2`。scikit-fem 组装稀疏矩阵，消去固定自由度后交由 SciPy 求解。
+Each triangle has a constant relative permittivity, passed to the bilinear form through an `ElementTriP0` material field. The potential uses `ElementTriP1` or `ElementTriP2`. scikit-fem assembles the sparse matrix, condenses fixed degrees of freedom, and delegates the solve to SciPy.
 
-空气盒外边界采用零法向电位移的自然条件；具体几何见[几何、材料与边界](geometry.md)。P2 时固定电位条件同时施加在导体的顶点和边中点自由度上。
+The air-box exterior has the natural zero-normal-displacement condition described under [geometry and boundaries](geometry.md). With P2, conductor potentials are fixed at both vertices and edge midpoints.
 
-## 由能量得到电容
+## Capacitance from energy
 
-每单位传播长度的电场能量为：
+Electric-field energy per unit propagation length is:
 
 ```text
 U′ = 1/2 ∫Ω ε |∇φ|² dA = 1/2 φᵀ K φ
 C′ = 2U′ / V²
 ```
 
-由于 V=1 V，代码直接取 `φᵀ K φ` 的数值作为单位长度电容。矩阵中的坐标已转换成米，结果单位是 F/m。能量使用完整电位向量和原始刚度矩阵计算。
+With V=1 V, the numerical value of `φᵀ K φ` directly gives capacitance per unit length. FEM coordinates are in meters, so the result is in F/m. Energy is evaluated with the complete potential vector and the original stiffness matrix.
 
-## 准 TEM 参数
+## Quasi-TEM parameters
 
-对非磁性、理想导体的准 TEM 近似：
+For nonmagnetic media and ideal conductors under the quasi-TEM approximation:
 
 ```text
 εeff = C / C0
@@ -52,23 +54,23 @@ vp = 1 / sqrt(L C) = c / sqrt(εeff)
 Z0 = sqrt(L / C) = 1 / (c sqrt(C C0))
 ```
 
-其中 C 和 C0 的单位为 F/m，L 为 H/m，vp 为 m/s，Z0 为 Ω，c 为真空光速。程序的常数 c 与 ε0 来自 `scipy.constants`。
+C and C0 use F/m; L uses H/m; vp uses m/s; Z0 uses Ω. The constants c and ε0 come from `scipy.constants`.
 
-有效介电常数是整个横截面的等效参数，并不是对两层介电常数做算术平均。场在空气和不同介质中的分布会共同影响它。
+Effective permittivity describes the whole cross section. It is not the arithmetic average of the layer permittivities: field distribution through air and both dielectric layers determines it.
 
-## 误差与适用限制
+## Error sources and scope
 
-主要误差来自网格离散、导体尖角附近的场变化、有限宽基板/地以及有限空气盒截断。提高阶数通常有帮助，但不能替代[收敛检查](validation.md)。
+Important error sources are mesh discretization, rapidly varying fields near sharp conductor corners, finite substrate and ground width, and air-box truncation. Higher-order elements can help, but do not replace [convergence checks](validation.md).
 
-二维静电模型没有频率变量。结果适用于准静态和准 TEM 假设成立的情形；不能从本程序直接得到导体损耗、介质损耗、频率色散、辐射、高阶模式或三维结构的 S 参数。
+The model has no frequency variable. It applies where the quasi-static and quasi-TEM assumptions are appropriate. It does not compute conductor or dielectric loss, dispersion, radiation, higher-order modes, or S parameters for three-dimensional structures.
 
-## 实现对应关系
+## Implementation map
 
-| 计算步骤 | 源码位置 |
+| Step | Code |
 | --- | --- |
-| 参数与派生尺寸 | `MicrostripGeometry` |
-| 几何碎分、距离场网格、SI 坐标转换 | `generate_mesh()` |
-| 材料场、刚度矩阵、边界自由度、能量电容 | `solve_electrostatic()` |
-| 面积因子换算、双求解、准 TEM 参数、JSON 输出 | `main()` |
+| Inputs and derived dimensions | `MicrostripGeometry` |
+| Geometry fragmentation, distance-field mesh, and SI conversion | `generate_mesh()` |
+| Material field, stiffness matrix, boundary DOFs, and energy | `solve_electrostatic()` |
+| Mesh-factor conversion, two solves, quasi-TEM parameters, and JSON | `main()` |
 
-进一步阅读：[scikit-fem 文档](https://scikit-fem.readthedocs.io/)、[Gmsh 参考手册](https://gmsh.info/doc/texinfo/)。
+Further reading: [scikit-fem documentation](https://scikit-fem.readthedocs.io/) and the [Gmsh reference manual](https://gmsh.info/doc/texinfo/).

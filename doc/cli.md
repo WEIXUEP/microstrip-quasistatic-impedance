@@ -1,68 +1,68 @@
-# 命令行参数
+# Command-line reference
 
 ```shell
 python microstrip_quasistatic.py --help
 ```
 
-以下默认值来自 `parse_args()`，对应直接运行脚本的行为。长度单位均为 **mil**，介电常数和面积因子无量纲。
+The defaults below come from `parse_args()` and describe direct script execution. All lengths use **mil**. Relative permittivities and area factors are dimensionless.
 
-## 完整参数表
+## All options
 
-| 参数 | 默认值 | 含义 |
+| Option | Default | Description |
 | --- | ---: | --- |
-| `--h1` | 2.97 | 下层介质厚度 |
-| `--h2` | 3.53 | 上层介质厚度，包含信号线厚度 |
-| `--er1` | 4.20 | 下层相对介电常数 |
-| `--er2` | 4.20 | 上层相对介电常数 |
-| `--w1` | **10.00** | 信号线底部宽度 |
-| `--w2` | 5.60 | 信号线顶部宽度 |
-| `--trace-thickness` | 1.80 | 信号线厚度，必须小于 H2 |
-| `--trace-mesh-area-factor` | 50.0 | 走线面积除数，用于推导近导体网格尺寸 |
-| `--far-mesh-area-factor` | 400.0 | 计算域面积除数，用于推导远处网格尺寸 |
-| `--order` | 2 | 有限元阶数，只能为 1 或 2 |
-| `--output` | 脚本旁的 `output/` | 输出目录，可使用绝对路径 |
-| `-h`, `--help` | — | 显示帮助并退出 |
+| `--h1` | 2.97 | Lower dielectric thickness |
+| `--h2` | 3.53 | Upper dielectric thickness, including the trace |
+| `--er1` | 4.20 | Lower relative permittivity |
+| `--er2` | 4.20 | Upper relative permittivity |
+| `--w1` | **10.00** | Bottom trace width |
+| `--w2` | 5.60 | Top trace width |
+| `--trace-thickness` | 1.80 | Trace thickness; must be less than H2 |
+| `--trace-mesh-area-factor` | 50.0 | Trace-area divisor used to derive the near-conductor size |
+| `--far-mesh-area-factor` | 400.0 | Domain-area divisor used to derive the far-field size |
+| `--order` | 2 | Potential-space order: 1 or 2 |
+| `--output` | `output/` beside the script | Output directory; absolute paths are accepted |
+| `-h`, `--help` | — | Show help and exit |
 
-!!! note "CLI 与 Python 类默认值有区别"
-    `MicrostripGeometry()` 的 `w1` 默认是 **5.60**，CLI 的 `--w1` 默认是 **10.00**。直接构造类得到矩形走线，直接运行脚本得到梯形走线。复现实验时请显式填写关键尺寸，不要混用两套默认值。
+!!! note "CLI and Python defaults differ"
+    `MicrostripGeometry()` defaults to **w1=5.60**, whereas the CLI defaults to **w1=10.00**. Constructing the class directly gives a rectangular trace; running the script without arguments gives a trapezoid. Specify important dimensions explicitly when reproducing a calculation.
 
-## 网格面积因子
+## Mesh-area factors
 
-CLI 在生成网格前计算：
+Before generating the mesh, the CLI calculates:
 
 ```text
 trace_area = (W1 + W2) × T / 2
-simulation_area = 空气盒总宽 × 空气盒总高
+simulation_area = total air-box width × total air-box height
 mesh_size_trace = sqrt(trace_area / trace_mesh_area_factor)
 mesh_size_far = sqrt(simulation_area / far_mesh_area_factor)
 ```
 
-面积使用 mil²，推导得到的尺寸使用 mil。因子越大，目标网格越细；它们不是单元数量，也不能直接解释为误差容限。因子乘以 4，会将对应目标尺寸减半。
+Areas use mil² and derived sizes use mil. Larger factors produce smaller target sizes. These factors are neither element counts nor error tolerances. Multiplying a factor by four halves its target size.
 
-Gmsh 的距离场同时参考信号线和地的曲线，在近处和远处目标尺寸之间过渡。实际单元数还取决于几何、距离场和网格算法。
+The Gmsh distance field references both signal and ground curves and transitions between the near and far target sizes. Actual element counts also depend on geometry, the distance field, and the meshing algorithm.
 
-## 有限元阶数与网格阶数
+## FEM order versus mesh order
 
-`--order 1` 使用三角形 P1 电位，`--order 2` 使用 P2 电位。**两种情况导出的 Gmsh 网格都是一阶三角形**；P2 的边中点自由度由 scikit-fem 创建，不会让 `.msh` 变成二阶网格。
+`--order 1` uses triangular P1 potentials; `--order 2` uses P2 potentials. **The exported Gmsh mesh uses first-order triangles in both cases.** scikit-fem creates the P2 edge-midpoint degrees of freedom internally; selecting P2 does not make the `.msh` a second-order mesh.
 
-## 常用命令
+## Common commands
 
-矩形走线：
+A rectangular trace:
 
 ```shell
 python microstrip_quasistatic.py --w1 10 --w2 10 --output output/rectangular
 ```
 
-保持几何不变，加密网格：
+Refine the mesh while keeping the geometry fixed:
 
 ```shell
 python microstrip_quasistatic.py --trace-mesh-area-factor 200 --far-mesh-area-factor 1600 --output output/refined
 ```
 
-真空一致性检查：
+Check vacuum consistency:
 
 ```shell
 python microstrip_quasistatic.py --er1 1 --er2 1 --output output/vacuum
 ```
 
-更多收敛步骤和对照案例见[验证文档](validation.md)。
+See [convergence and benchmarks](validation.md) for systematic checks.

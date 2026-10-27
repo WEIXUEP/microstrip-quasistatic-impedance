@@ -1,14 +1,16 @@
-# 安装与快速开始
+# Installation & first run
 
-## 环境要求
+Run a default cross section, then change the geometry and read its impedance.
 
-- Python **3.10+**；文档发布工作流使用 Python 3.11。
-- 可安装 Python 包的网络环境。
-- Gmsh Python 包所需的本机动态库；无需单独安装 Gmsh 桌面程序。
+## Requirements
 
-运行依赖见 `requirements.txt`：Gmsh、NumPy、SciPy 和 scikit-fem。文档依赖独立放在 `requirements-docs.txt`，只运行计算时不需要安装。
+- Python **3.10 or newer**. The documentation workflow uses Python 3.11.
+- Network access to install Python packages.
+- Native libraries required by the Gmsh Python wheel. A separate Gmsh desktop installation is not required.
 
-## 克隆仓库
+The solver dependencies in `requirements.txt` are Gmsh, NumPy, SciPy, and scikit-fem. Documentation dependencies are separate; you do not need them to run a calculation.
+
+## Clone the repository
 
 ```shell
 git clone https://github.com/WEIXUEP/microstrip-quasistatic-impedance.git
@@ -17,7 +19,7 @@ cd microstrip-quasistatic-impedance
 
 ## Windows PowerShell
 
-以下写法直接调用虚拟环境中的 Python，无需修改 PowerShell 执行策略或激活脚本：
+Call the virtual environment's Python directly. This avoids activating a script or changing your execution policy.
 
 ```powershell
 python -m venv .venv
@@ -26,7 +28,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe microstrip_quasistatic.py
 ```
 
-查看参数帮助：
+Inspect the command-line help:
 
 ```powershell
 .\.venv\Scripts\python.exe microstrip_quasistatic.py --help
@@ -41,21 +43,21 @@ python3 -m venv .venv
 .venv/bin/python microstrip_quasistatic.py
 ```
 
-在部分 Ubuntu/Debian 最小化环境中，可能需要 `python3-venv` 和 `libglu1-mesa` 系统包。具体动态库报错见[常见问题](troubleshooting.md)。
+Minimal Ubuntu/Debian installations may need `python3-venv` and `libglu1-mesa`. See [troubleshooting](troubleshooting.md) for native-library errors.
 
-## 自定义一个梯形走线 {#custom-case}
+## Run a custom trace {#custom-case}
 
-以下例子使用 H1=5、H2=5、W1=20、W2=50、T=1 mil，二阶有限元。命令放在一行，可在 PowerShell 和 Bash 中使用。运行前将 `python` 换成上面对应的虚拟环境 Python 路径，或激活虚拟环境。
+This example uses H1=5, H2=5, W1=20, W2=50, and T=1 mil, with second-order finite elements. The single-line command works in PowerShell and Bash. Replace `python` with the appropriate virtual-environment path above, or activate the environment first.
 
 ```shell
 python microstrip_quasistatic.py --h1 5 --h2 5 --er1 3.66 --er2 4.2 --w1 20 --w2 50 --trace-thickness 1 --order 2 --output output/custom
 ```
 
-本例 W2 > W1，表示上宽下窄的梯形；矩形走线需要显式设置 `--w1` 和 `--w2` 为相同数值。
+W2 > W1 makes this a trace with a wider top than bottom. To model a rectangular trace, explicitly set `--w1` and `--w2` to the same value. H2 includes the trace thickness, so `0 < T < H2`.
 
-## 检查结果
+## Inspect the result
 
-程序输出网格顶点数、三角形数、有限元自由度数、电容、相速度、电感和阻抗。默认文件为：
+The terminal prints mesh vertices, triangles, finite-element degrees of freedom, capacitances, phase velocity, inductance, and impedance. The default files are:
 
 ```text
 output/
@@ -63,17 +65,17 @@ output/
 └── result.json
 ```
 
-读取关键字段：
+Read the main fields with Python:
 
 ```python
 import json
 from pathlib import Path
 
 result = json.loads(Path("output/result.json").read_text(encoding="utf-8"))
-print(f"Z0 = {result['characteristic_impedance_ohm']:.6f} Ω")
-print(f"εeff = {result['effective_permittivity']:.6f}")
+print(f"Z0 = {result['characteristic_impedance_ohm']:.6f} ohm")
+print(f"Effective permittivity = {result['effective_permittivity']:.6f}")
 ```
 
-`--output` 指定相对路径时，相对于命令执行目录；省略该参数时，输出固定在脚本所在目录的 `output/`。同一输出目录再次运行会覆盖原文件，参数扫描应使用不同目录。
+An explicit relative `--output` path is relative to the current working directory. Without this option, files go to `output/` beside the script. Reusing a directory overwrites the previous files; choose separate directories for parameter sweeps.
 
-下一步：[核对几何与边界](geometry.md)、[查看完整参数](cli.md)、[验证结果收敛](validation.md)。
+Continue with the [geometry definition](geometry.md), [complete CLI reference](cli.md), or [convergence checks](validation.md).
