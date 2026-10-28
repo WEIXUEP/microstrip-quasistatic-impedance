@@ -12,7 +12,8 @@ hide:
 Compute quasi-TEM impedance with two electrostatic finite-element solves. Define the layers and trace, generate a mesh, and inspect the result in Python.
 
 <div class="qs-actions" markdown>
-[Run your first case](quickstart.md){ .md-button .md-button--primary }
+[Open calculator](calculator/index.md){ .md-button .md-button--primary }
+[Run in Python](quickstart.md){ .md-button }
 [Explore the model](geometry.md){ .md-button }
 </div>
 </div>

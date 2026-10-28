@@ -57,6 +57,7 @@ extra_css:
   - assets/stylesheets/engineering.css
 nav:
   - Overview: index.md
+  - Calculator: calculator/index.md
   - User guide:
       - Installation & first run: quickstart.md
       - Geometry & boundaries: geometry.md

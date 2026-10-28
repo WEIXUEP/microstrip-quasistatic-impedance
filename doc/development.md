@@ -91,6 +91,7 @@ Build deployable HTML:
 
 ```shell
 python -m mkdocs build --strict
+python scripts/prepare_calculator.py
 ```
 
 The output is in `site/`. Preview over HTTP so directory links and search work correctly:
@@ -98,6 +99,40 @@ The output is in `site/`. Preview over HTTP so directory links and search work c
 ```shell
 python -m http.server 8000 --directory site
 ```
+
+## Browser calculator
+
+The calculator generates the same two-layer geometry with Gmsh WebAssembly and
+uses the Python solver for the two electrostatic solves. The first calculation
+downloads Python, NumPy, SciPy, and scikit-fem from external package services;
+the Gmsh module is hosted with the site. A worker keeps the page responsive.
+
+After each strict build, `python scripts/prepare_calculator.py` downloads the
+pinned Gmsh 0.4.0 archive, verifies its SHA-256 digest, and places its runtime
+and license in `site/calculator/vendor/`. It also copies the current solver to
+the site. This step requires network access. The documentation workflow runs it
+automatically; `mkdocs serve` alone does not prepare the calculator runtime.
+
+The calculator requires HTTPS or localhost and a browser supporting WebAssembly,
+Web Workers, service workers, and shared memory. Its scoped
+`coi-serviceworker.js` injects isolation headers for the calculator on static
+hosting. The service worker is [MIT licensed](calculator/coi-serviceworker.LICENSE.txt).
+Gmsh WebAssembly is GPL-2.0-or-later; its [corresponding source and build
+instructions](https://github.com/loumalouomega/GMSH-JS/tree/v0.4.0), plus its
+license, are provided separately from this project's Apache-licensed source.
+Results are numerical estimates; validate mesh and domain convergence.
+
+To run the optional browser regression checks after preparing the site, install
+Playwright for Python and a supported Chromium browser, then run:
+
+```shell
+python scripts/check_browser_calculator.py
+```
+
+The script exercises the default, vacuum, and custom cases, JSON download,
+input validation, and mobile layout. Pass `--channel msedge` to use an installed
+Microsoft Edge instead of Playwright's bundled Chromium. It downloads runtime
+dependencies and may take time on the first run.
 
 ## Interface design
 
