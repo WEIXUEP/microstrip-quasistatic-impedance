@@ -41,6 +41,21 @@ The trace starts at the dielectric interface and extends into the upper layer;
 H2 includes T, so `0 < T < H2`. Use equal W1/W2 for a rectangular trace.
 See the [complete CLI reference](doc/cli.md) for defaults and mesh controls.
 
+## Desktop interface
+
+Install the optional PySide6 interface and launch the window with the same
+Python environment used by the solver:
+
+```shell
+python -m pip install -r requirements-gui.txt
+python microstrip_gui.py
+```
+
+The window accepts geometry and mesh settings, displays the calculated
+transmission-line parameters, and can save the result JSON and Gmsh mesh. It
+can also be run from Spyder when Spyder uses that Python environment. See the
+[desktop guide](doc/desktop.md) for details.
+
 ## Results and model
 
 The script solves the real dielectric case for capacitance C and an otherwise

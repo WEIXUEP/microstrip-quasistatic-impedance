@@ -9,6 +9,8 @@ on:
       - 'mkdocs.yml'
       - 'requirements-docs.txt'
       - 'microstrip_quasistatic.py'
+      - 'microstrip_gui.py'
+      - 'requirements-gui.txt'
       - 'scripts/prepare_calculator.py'
       - '.github/workflows/docs.yml'
   pull_request:
@@ -18,6 +20,8 @@ on:
       - 'mkdocs.yml'
       - 'requirements-docs.txt'
       - 'microstrip_quasistatic.py'
+      - 'microstrip_gui.py'
+      - 'requirements-gui.txt'
       - 'scripts/prepare_calculator.py'
       - '.github/workflows/docs.yml'
   workflow_dispatch:

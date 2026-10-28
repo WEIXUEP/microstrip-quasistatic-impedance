@@ -60,6 +60,7 @@ nav:
   - Calculator: calculator/index.md
   - User guide:
       - Installation & first run: quickstart.md
+      - Desktop calculator: desktop.md
       - Geometry & boundaries: geometry.md
       - Command-line reference: cli.md
       - Output reference: output.md
